@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+    <name>Set Book Picked Up Flag</name>
+    <directory>set book picked up flag</directory>
+    <id>3085941996</id>
+    <description>Flash Isaac has a greater chance to spawn a Library if you touch a book. That behavior is built into this version of Isaac as well, but the STATE_BOOK_PICKED_UP flag never seems to get set. This mod sets the flag whenever you acquire a book.
+
+See the [url=https://bindingofisaacrebirth.fandom.com/wiki/Level_Generation]wiki[/url] for more information.
+
+It seems that this behavior is [url=https://github.com/UnderscoreKilburn/repentance-issues/issues/980]likely on purpose[/url], but you can enable it if you want to with this mod.</description>
+    <version>1.1</version>
+    <visibility>Public</visibility>
+    <tag id="Lua"/>
+    <tag id="Tweaks"/>
+</metadata>
