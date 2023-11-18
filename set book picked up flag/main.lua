@@ -31,7 +31,7 @@ end
 -- as well as items given via the debug console
 function mod:checkAndSetFlag()
   if game:GetStateFlag(GameStateFlag.STATE_BOOK_PICKED_UP) then
-    return
+    return false
   end
   
   if mod.books == nil then
