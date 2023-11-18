@@ -12,9 +12,24 @@ local game = Game()
 
 mod.books = nil
 
+function mod:onGameStart(isContinue)
+  if not isContinue and game:GetFrameCount() == 0 then
+    -- setting the state in MC_POST_PLAYER_INIT causes the first floor to load with the correct library state
+    -- unfortunately, player:HasCollectible doesn't work from there, so reload the stage from here
+    if mod:checkAndSetFlag() then
+      -- this does not break true co-op
+      mod:reloadStage()
+    end
+  end
+end
+
+function mod:onUpdate()
+  mod:checkAndSetFlag()
+end
+
 -- not using QueuedItem so we can check for default items
 -- as well as items given via the debug console
-function mod:onPlayerUpdate(player)
+function mod:checkAndSetFlag()
   if game:GetStateFlag(GameStateFlag.STATE_BOOK_PICKED_UP) then
     return
   end
@@ -23,21 +38,21 @@ function mod:onPlayerUpdate(player)
     mod.books = mod:getBooks()
   end
   
+  -- there should be more books than players
   for _, book in ipairs(mod.books) do
-    if player:HasCollectible(book, true) then
-      game:SetStateFlag(GameStateFlag.STATE_BOOK_PICKED_UP, true)
-      --print('set STATE_BOOK_PICKED_UP = true')
+    for i = 0, game:GetNumPlayers() - 1 do
+      local player = game:GetPlayer(i)
       
-      -- setting the state in MC_POST_PLAYER_INIT causes the first floor to load with the correct library state
-      -- unfortunately, HasCollectible doesn't work from there, so reload the stage from here
-      if game:GetFrameCount() == 0 then
-        -- this does not break true co-op
-        mod:reloadStage()
+      if player:HasCollectible(book, true) then
+        game:SetStateFlag(GameStateFlag.STATE_BOOK_PICKED_UP, true)
+        --print('set STATE_BOOK_PICKED_UP = true')
+        
+        return true
       end
-      
-      return
     end
   end
+  
+  return false
 end
 
 -- get books so we can loop over a smaller list of items
@@ -74,5 +89,6 @@ function mod:reloadStage()
   end
 end
 
--- MC_POST_UPDATE runs less often, but reloading the stage looks janky
-mod:AddCallback(ModCallbacks.MC_POST_PLAYER_UPDATE, mod.onPlayerUpdate, 0) -- 0 is player, 1 is co-op baby
+-- MC_POST_UPDATE runs less often than MC_POST_PLAYER_UPDATE
+mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, mod.onGameStart)
+mod:AddCallback(ModCallbacks.MC_POST_UPDATE, mod.onUpdate)

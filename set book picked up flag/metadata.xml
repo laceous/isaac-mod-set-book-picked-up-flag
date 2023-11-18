@@ -8,7 +8,7 @@
 See the [url=https://bindingofisaacrebirth.fandom.com/wiki/Level_Generation]wiki[/url] for more information.
 
 It seems that this behavior is [url=https://github.com/UnderscoreKilburn/repentance-issues/issues/980]likely on purpose[/url], but you can enable it if you want to with this mod.</description>
-    <version>1.1</version>
+    <version>1.2</version>
     <visibility>Public</visibility>
     <tag id="Lua"/>
     <tag id="Tweaks"/>
