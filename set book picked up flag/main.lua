@@ -28,11 +28,22 @@ function mod:onGameStart(isContinue)
   end
   
   if not isContinue and game:GetFrameCount() == 0 then
-    -- setting the state in MC_POST_PLAYER_INIT causes the first floor to load with the correct library state
-    -- unfortunately, player:HasCollectible doesn't work from there, so reload the stage from here
-    if mod:checkAndSetFlag() then
-      -- this does not break true co-op
-      mod:reloadStage()
+    if REPENTOGON then
+      if game:GetStateFlag(GameStateFlag.STATE_BOOK_PICKED_UP) then
+        if mod.state.checkQueuedItem then
+          -- exclude starting items
+          game:SetStateFlag(GameStateFlag.STATE_BOOK_PICKED_UP, false)
+        else
+          mod:reloadStage()
+        end
+      end
+    else
+      -- setting the state in MC_POST_PLAYER_INIT causes the first floor to load with the correct library state
+      -- unfortunately, player:HasCollectible doesn't work from there, so reload the stage from here
+      if mod:checkAndSetFlag() then
+        -- this does not break true co-op
+        mod:reloadStage()
+      end
     end
   end
 end
@@ -43,6 +54,22 @@ end
 
 function mod:save()
   mod:SaveData(json.encode(mod.state))
+end
+
+function mod:onAddCollectible(collectible, charge, firstTime, slot, varData, player)
+  if game:GetStateFlag(GameStateFlag.STATE_BOOK_PICKED_UP) then
+    return
+  end
+  
+  if firstTime then
+    local itemConfig = Isaac.GetItemConfig()
+    local collectibleConfig = itemConfig:GetCollectible(collectible)
+    
+    if collectibleConfig and collectibleConfig:HasTags(ItemConfig.TAG_BOOK) then
+      game:SetStateFlag(GameStateFlag.STATE_BOOK_PICKED_UP, true)
+      --print('set STATE_BOOK_PICKED_UP = true')
+    end
+  end
 end
 
 function mod:onUpdate()
@@ -172,10 +199,14 @@ function mod:setupModConfigMenu()
 end
 -- end ModConfigMenu --
 
--- MC_POST_UPDATE runs less often than MC_POST_PLAYER_UPDATE
 mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, mod.onGameStart)
 mod:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, mod.onGameExit)
-mod:AddCallback(ModCallbacks.MC_POST_UPDATE, mod.onUpdate)
+if REPENTOGON then
+  mod:AddCallback(ModCallbacks.MC_POST_ADD_COLLECTIBLE, mod.onAddCollectible)
+else
+  -- MC_POST_UPDATE runs less often than MC_POST_PLAYER_UPDATE
+  mod:AddCallback(ModCallbacks.MC_POST_UPDATE, mod.onUpdate)
+end
 
 if ModConfigMenu then
   mod:setupModConfigMenu()

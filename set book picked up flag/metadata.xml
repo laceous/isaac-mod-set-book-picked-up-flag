@@ -13,8 +13,10 @@ Mod Config Menu will let you choose what it means to pick up a book:
 [list]
     [*]Check the player's inventory : This allows us to check if the player acquired a book by any means including starting items or via the debug console. For starting items, we can load the first floor with the flag enabled.
     [*]Check the player's queued item for a new book : This is a momentary check when the player grabs an item from a pedestal and holds it above his head. Characters like Judas (w/ The Book of Belial) won't set the flag at the start of the run which is similar to how Flash Isaac works. (Note: It's possible for another mod to clear the queue before we can check it. In that case, just switch to the other option.)
-[/list]</description>
-    <version>1.4</version>
+[/list]
+
+Update: If you have Repentogon, there's a new callback with better performance that we'll use. The option above will still let you differentiate between initial items and items you obtain later on.</description>
+    <version>1.5</version>
     <visibility>Public</visibility>
     <tag id="Lua"/>
     <tag id="Tweaks"/>
